@@ -26,10 +26,11 @@ public enum ENUM_Genero {
     ENUM_Genero(String etiqueta) {
         this.etiqueta = etiqueta;
     }
-    
+
     public String getEtiqueta() {
         return etiqueta;
     }
+
     @Override
     public String toString() {
         return etiqueta;

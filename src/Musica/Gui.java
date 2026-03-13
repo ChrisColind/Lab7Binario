@@ -45,6 +45,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  * @author croge
  */
 public class Gui extends JFrame {
+
     private ConfiCanciones gestor;
 
     private DefaultListModel<Canciones> modeloLista;
@@ -94,11 +95,11 @@ public class Gui extends JFrame {
         JScrollPane scrollLista = new JScrollPane(listaCanciones);
         scrollLista.setPreferredSize(new Dimension(290, 0));
         scrollLista.setBorder(BorderFactory.createTitledBorder(
-        BorderFactory.createLineBorder(new Color(40, 40, 40)),
-            "Lista de Canciones",
-            0, 0,
-            new Font("Arial", Font.BOLD, 12),
-            new Color(179, 179, 179)
+                BorderFactory.createLineBorder(new Color(40, 40, 40)),
+                "Lista de Canciones",
+                0, 0,
+                new Font("Arial", Font.BOLD, 12),
+                new Color(179, 179, 179)
         ));
         scrollLista.getViewport().setBackground(new Color(18, 18, 18));
         add(scrollLista, BorderLayout.WEST);
@@ -130,10 +131,10 @@ public class Gui extends JFrame {
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 12));
         panelBotones.setBackground(new Color(9, 9, 9));
 
-        btnPlay   = crearBoton("▶  Play",    new Color(20, 90, 20));
-        btnPause  = crearBoton("⏸  Pause",   new Color(100, 75, 0));
-        btnStop   = crearBoton("⏹  Stop",    new Color(110, 20, 20));
-        btnAdd    = crearBoton("＋  Agregar", new Color(15, 60, 110));
+        btnPlay = crearBoton("▶  Play", new Color(20, 90, 20));
+        btnPause = crearBoton("⏸  Pause", new Color(100, 75, 0));
+        btnStop = crearBoton("⏹  Stop", new Color(110, 20, 20));
+        btnAdd = crearBoton("＋  Agregar", new Color(15, 60, 110));
         btnRemove = crearBoton("✕  Eliminar", new Color(80, 20, 20));
 
         btnPlay.addActionListener(e -> reproducirCancion());
@@ -212,13 +213,12 @@ public class Gui extends JFrame {
     }
 
     //====================REPRODUCCION=========================================
-
     private void reproducirCancion() {
         Canciones seleccionada = listaCanciones.getSelectedValue();
 
         if (seleccionada == null) {
             JOptionPane.showMessageDialog(this, "Selecciona una cancion primero.",
-                "Aviso", JOptionPane.WARNING_MESSAGE);
+                    "Aviso", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -227,15 +227,15 @@ public class Gui extends JFrame {
 
         if (!archivo.exists()) {
             JOptionPane.showMessageDialog(this,
-                "No se encontro el archivo:\n" + ruta,
-                "Error", JOptionPane.ERROR_MESSAGE);
+                    "No se encontro el archivo:\n" + ruta,
+                    "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         if (!ruta.toLowerCase().endsWith(".wav")) {
             JOptionPane.showMessageDialog(this,
-                "Solo se pueden reproducir archivos .WAV",
-                "Formato no soportado", JOptionPane.WARNING_MESSAGE);
+                    "Solo se pueden reproducir archivos .WAV",
+                    "Formato no soportado", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -253,18 +253,20 @@ public class Gui extends JFrame {
 
         } catch (UnsupportedAudioFileException e) {
             JOptionPane.showMessageDialog(this, "Formato de audio no soportado.",
-                "Error", JOptionPane.ERROR_MESSAGE);
+                    "Error", JOptionPane.ERROR_MESSAGE);
         } catch (LineUnavailableException e) {
             JOptionPane.showMessageDialog(this, "Linea de audio no disponible.",
-                "Error", JOptionPane.ERROR_MESSAGE);
+                    "Error", JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error al leer el archivo de audio.",
-                "Error", JOptionPane.ERROR_MESSAGE);
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     private void pausarCancion() {
-        if (clipAudio == null) return;
+        if (clipAudio == null) {
+            return;
+        }
 
         if (!pausado) {
             posicionPausa = clipAudio.getMicrosecondPosition();
@@ -290,19 +292,18 @@ public class Gui extends JFrame {
     }
 
     //====================GESTION DE CANCIONES==================================
-
     private void agregarCancion() {
         File carpetaDescargas = new File(System.getProperty("user.home") + File.separator + "Downloads");
-        JTextField campoNombre   = new JTextField();
-        JTextField campoArtista  = new JTextField();
+        JTextField campoNombre = new JTextField();
+        JTextField campoArtista = new JTextField();
         JComboBox<ENUM_Genero> comboGenero = new JComboBox<>(ENUM_Genero.values());
 
-        JButton btnCancion = new JButton("Seleccionar cancion...");
-        JButton btnImagen  = new JButton("Seleccionar imagen...");
+        JButton btnCancion = new JButton("Seleccionar cancion");
+        JButton btnImagen = new JButton("Seleccionar imagen");
         JLabel labelCancion = new JLabel("Ninguna cancion seleccionada");
-        JLabel labelImagen  = new JLabel("Ninguna imagen seleccionada");
+        JLabel labelImagen = new JLabel("Ninguna imagen seleccionada");
 
-        final String[] rutaAudio  = {""};
+        final String[] rutaAudio = {""};
         final String[] rutaImagen = {""};
 
         btnCancion.addActionListener(e -> {
@@ -336,11 +337,13 @@ public class Gui extends JFrame {
         panel.add(labelImagen);
 
         int resultado = JOptionPane.showConfirmDialog(this, panel,
-            "Agregar cancion", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                "Agregar cancion", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
-        if (resultado != JOptionPane.OK_OPTION) return;
+        if (resultado != JOptionPane.OK_OPTION) {
+            return;
+        }
 
-        String nombre  = campoNombre.getText().trim();
+        String nombre = campoNombre.getText().trim();
         String artista = campoArtista.getText().trim();
 
         if (nombre.isEmpty() || artista.isEmpty()) {
@@ -352,15 +355,34 @@ public class Gui extends JFrame {
             JOptionPane.showMessageDialog(this, "Debes seleccionar una cancion.");
             return;
         }
+            
 
         String duracion      = calcularDuracion(rutaAudio[0]);
         ENUM_Genero generoElegido = (ENUM_Genero) comboGenero.getSelectedItem();
 
-        Canciones nueva = new Canciones(nombre, artista, duracion, generoElegido, rutaAudio[0], rutaImagen[0]);
-        gestor.agregarCancion(nueva);
+        String rutaFinalAudio  = copiarArchivo(rutaAudio[0], "canciones");
+        String rutaFinalImagen = rutaImagen[0].isEmpty() ? "" : copiarArchivo(rutaImagen[0], "portadas");
+
+        Canciones nueva = new Canciones(nombre, artista, duracion, generoElegido, rutaFinalAudio, rutaFinalImagen);
+
         modeloLista.addElement(nueva);
     }
-    
+    private String copiarArchivo(String rutaOrigen, String carpetaDestino) {
+        try {
+            File origen  = new File(rutaOrigen);
+            File destino = new File(carpetaDestino + File.separator + origen.getName());
+
+            if (!destino.exists()) {
+                java.nio.file.Files.copy(origen.toPath(), destino.toPath());
+            }
+
+            return destino.getAbsolutePath();
+
+        } catch (IOException e) {
+            System.out.println("Error al copiar archivo: " + e.getMessage());
+            return rutaOrigen;
+        }
+    }
     private String calcularDuracion(String ruta) {
         try {
             File archivo = new File(ruta);
@@ -379,20 +401,23 @@ public class Gui extends JFrame {
             return "Desconocida";
         }
     }
+
     private void eliminarCancion() {
         int indice = listaCanciones.getSelectedIndex();
 
         if (indice < 0) {
-            JOptionPane.showMessageDialog(this, "Selecciona una canción para eliminar.",
-                "Aviso", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Selecciona una cancion para eliminar.",
+                    "Aviso", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         int respuesta = JOptionPane.showConfirmDialog(this,
-            "¿Seguro que deseas eliminar esta canción?",
-            "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
+                "¿Seguro que deseas eliminar esta canción?",
+                "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
 
-        if (respuesta != JOptionPane.YES_OPTION) return;
+        if (respuesta != JOptionPane.YES_OPTION) {
+            return;
+        }
 
         detenerCancion();
         gestor.eliminarCancion(indice);
@@ -406,7 +431,7 @@ public class Gui extends JFrame {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
-            System.out.println("E   rror de look and feel del sistema.");
+            System.out.println("Error de look and feel del sistema.");
         }
 
         SwingUtilities.invokeLater(() -> {
