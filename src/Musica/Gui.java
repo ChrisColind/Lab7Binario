@@ -376,7 +376,7 @@ public class Gui extends JFrame {
                 java.nio.file.Files.copy(origen.toPath(), destino.toPath());
             }
 
-            return destino.getAbsolutePath();
+            return carpetaDestino + File.separator + origen.getName();
 
         } catch (IOException e) {
             System.out.println("Error al copiar archivo: " + e.getMessage());
