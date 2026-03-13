@@ -10,6 +10,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
@@ -31,11 +32,13 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -289,43 +292,71 @@ public class Gui extends JFrame {
     //====================GESTION DE CANCIONES==================================
 
     private void agregarCancion() {
-        JFileChooser selectorAudio = new JFileChooser();
-        selectorAudio.setDialogTitle("Seleccionar archivo de audio (.WAV)");
-        selectorAudio.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter(
-            "Archivos WAV", "wav"));
-        if (ultimaCarpeta != null) selectorAudio.setCurrentDirectory(ultimaCarpeta);
+        File carpetaDescargas = new File(System.getProperty("user.home") + File.separator + "Downloads");
+        JTextField campoNombre   = new JTextField();
+        JTextField campoArtista  = new JTextField();
+        JComboBox<ENUM_Genero> comboGenero = new JComboBox<>(ENUM_Genero.values());
 
-        if (selectorAudio.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) return;
-        ultimaCarpeta = selectorAudio.getSelectedFile().getParentFile();
-        String rutaAudio = selectorAudio.getSelectedFile().getAbsolutePath();
+        JButton btnCancion = new JButton("Seleccionar cancion...");
+        JButton btnImagen  = new JButton("Seleccionar imagen...");
+        JLabel labelCancion = new JLabel("Ninguna cancion seleccionada");
+        JLabel labelImagen  = new JLabel("Ninguna imagen seleccionada");
 
-        JFileChooser selectorImg = new JFileChooser();
-        selectorImg.setDialogTitle("Seleccionar imagen del álbum (opcional)");
-        selectorImg.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter(
-            "Imagenes", "jpg", "jpeg", "png", "gif"));
-        if (ultimaCarpeta != null) selectorImg.setCurrentDirectory(ultimaCarpeta);
+        final String[] rutaAudio  = {""};
+        final String[] rutaImagen = {""};
 
-        String rutaImagen = "";
-        if (selectorImg.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            rutaImagen = selectorImg.getSelectedFile().getAbsolutePath();
+        btnCancion.addActionListener(e -> {
+            JFileChooser fc = new JFileChooser(carpetaDescargas);
+            fc.setFileFilter(new FileNameExtensionFilter("Archivos WAV", "wav"));
+            if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                rutaAudio[0] = fc.getSelectedFile().getAbsolutePath();
+                labelCancion.setText(fc.getSelectedFile().getName());
+            }
+        });
+
+        btnImagen.addActionListener(e -> {
+            JFileChooser fc = new JFileChooser(carpetaDescargas);
+            fc.setFileFilter(new FileNameExtensionFilter("Imagenes", "jpg", "jpeg", "png"));
+            if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                rutaImagen[0] = fc.getSelectedFile().getAbsolutePath();
+                labelImagen.setText(fc.getSelectedFile().getName());
+            }
+        });
+
+        JPanel panel = new JPanel(new GridLayout(10, 1, 5, 5));
+        panel.add(new JLabel("Nombre de la cancion:"));
+        panel.add(campoNombre);
+        panel.add(new JLabel("Artista:"));
+        panel.add(campoArtista);
+        panel.add(new JLabel("Genero:"));
+        panel.add(comboGenero);
+        panel.add(btnCancion);
+        panel.add(labelCancion);
+        panel.add(btnImagen);
+        panel.add(labelImagen);
+
+        int resultado = JOptionPane.showConfirmDialog(this, panel,
+            "Agregar cancion", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (resultado != JOptionPane.OK_OPTION) return;
+
+        String nombre  = campoNombre.getText().trim();
+        String artista = campoArtista.getText().trim();
+
+        if (nombre.isEmpty() || artista.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "El nombre y el artista no pueden estar vacios.");
+            return;
         }
 
-        String nombre = JOptionPane.showInputDialog(this, "Nombre de la cancion:");
-        if (nombre == null || nombre.trim().isEmpty()) return;
+        if (rutaAudio[0].isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Debes seleccionar una cancion.");
+            return;
+        }
 
-        String artista = JOptionPane.showInputDialog(this, "Artista:");
-        if (artista == null || artista.trim().isEmpty()) return;
-
-        String duracion = calcularDuracion(rutaAudio);
-       
-
-        JComboBox<ENUM_Genero> comboGenero = new JComboBox<>(ENUM_Genero.values());
-        JOptionPane.showMessageDialog(this, comboGenero,
-            "Selecciona el genero", JOptionPane.PLAIN_MESSAGE);
+        String duracion      = calcularDuracion(rutaAudio[0]);
         ENUM_Genero generoElegido = (ENUM_Genero) comboGenero.getSelectedItem();
 
-        Canciones nueva = new Canciones(nombre.trim(), artista.trim(),
-            duracion.trim(), generoElegido, rutaAudio, rutaImagen);
+        Canciones nueva = new Canciones(nombre, artista, duracion, generoElegido, rutaAudio[0], rutaImagen[0]);
         gestor.agregarCancion(nueva);
         modeloLista.addElement(nueva);
     }
